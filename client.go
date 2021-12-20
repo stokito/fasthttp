@@ -2000,8 +2000,8 @@ func dialAddr(addr string, dial DialFunc, dialDualStack, isTLS bool, tlsConfig *
 		} else {
 			dial = Dial
 		}
-		addr = addMissingPort(addr, isTLS)
 	}
+	addr = addMissingPort(addr, isTLS)
 	conn, err := dial(addr)
 	if err != nil {
 		return nil, err
