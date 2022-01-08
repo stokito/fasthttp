@@ -1442,16 +1442,22 @@ func (req *Request) Write(w *bufio.Writer) error {
 		hasBody = true
 		req.Header.SetContentLength(len(body))
 	}
-	if err = req.Header.Write(w); err != nil {
-		return err
-	}
 	if hasBody {
-		_, err = w.Write(body)
-	} else if len(body) > 0 {
-		if req.secureErrorLogMessage {
-			return fmt.Errorf("non-zero body for non-POST request")
+		if err = req.Header.Write(w); err != nil {
+			return err
 		}
-		return fmt.Errorf("non-zero body for non-POST request. body=%q", body)
+		_, err = w.Write(body)
+	} else {
+		if len(body) == 0 {
+			if err = req.Header.Write(w); err != nil {
+				return err
+			}
+		} else {
+			if req.secureErrorLogMessage {
+				return fmt.Errorf("non-zero body for non-POST request")
+			}
+			return fmt.Errorf("non-zero body for non-POST request. body=%q", body)
+		}
 	}
 	return err
 }
