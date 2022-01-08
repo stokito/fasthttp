@@ -1443,10 +1443,11 @@ func (req *Request) Write(w *bufio.Writer) error {
 		req.Header.SetContentLength(len(body))
 	}
 	if hasBody {
-		if err = req.Header.Write(w); err != nil {
-			return err
+		headersBody := net.Buffers{
+			req.Header.Header(),
+			body,
 		}
-		_, err = w.Write(body)
+		_, err = headersBody.WriteTo(w)
 	} else {
 		if len(body) == 0 {
 			if err = req.Header.Write(w); err != nil {
